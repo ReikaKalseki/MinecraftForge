@@ -1,6 +1,6 @@
---- ../src_base/minecraft/net/minecraft/client/multiplayer/WorldClient.java
-+++ ../src_work/minecraft/net/minecraft/client/multiplayer/WorldClient.java
-@@ -29,6 +29,9 @@
+--- ../src-base/minecraft/net/minecraft/client/multiplayer/WorldClient.java
++++ ../src-work/minecraft/net/minecraft/client/multiplayer/WorldClient.java
+@@ -34,6 +34,9 @@
  import net.minecraft.world.chunk.IChunkProvider;
  import net.minecraft.world.storage.SaveHandlerMP;
  
@@ -10,29 +10,29 @@
  @SideOnly(Side.CLIENT)
  public class WorldClient extends World
  {
-@@ -59,8 +62,11 @@
-         super(new SaveHandlerMP(), "MpServer", WorldProvider.getProviderForDimension(par3), par2WorldSettings, par5Profiler, par6ILogAgent);
-         this.sendQueue = par1NetClientHandler;
-         this.difficultySetting = par4;
-+        this.mapStorage = par1NetClientHandler.mapStorage;
-+        this.isRemote = true;
-+        finishSetup();
-         this.setSpawnLocation(8, 64, 8);
--        this.mapStorage = par1NetClientHandler.mapStorage;
+@@ -51,8 +54,11 @@
+         super(new SaveHandlerMP(), "MpServer", WorldProvider.func_76570_a(p_i45063_3_), p_i45063_2_, p_i45063_5_);
+         this.field_73035_a = p_i45063_1_;
+         this.field_73013_u = p_i45063_4_;
+-        this.func_72950_A(8, 64, 8);
+         this.field_72988_C = p_i45063_1_.field_147305_a;
++        this.field_72995_K = true;
++        this.finishSetup();
++        this.func_72950_A(8, 64, 8);
 +        MinecraftForge.EVENT_BUS.post(new WorldEvent.Load(this));
      }
  
-     /**
-@@ -290,6 +296,12 @@
-      */
-     protected void updateWeather()
+     public void func_72835_b()
+@@ -261,6 +267,12 @@
+ 
+     protected void func_72979_l()
      {
-+        super.updateWeather();
++        super.func_72979_l();
 +    }
 +
 +    @Override
 +    public void updateWeatherBody()
 +    {
-         if (!this.provider.hasNoSky)
+         if (!this.field_73011_w.field_76576_e)
          {
-             this.prevRainingStrength = this.rainingStrength;
+             ;

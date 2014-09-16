@@ -1,22 +1,17 @@
---- ../src_base/minecraft/net/minecraft/entity/Entity.java
-+++ ../src_work/minecraft/net/minecraft/entity/Entity.java
-@@ -1,10 +1,15 @@
+--- ../src-base/minecraft/net/minecraft/entity/Entity.java
++++ ../src-work/minecraft/net/minecraft/entity/Entity.java
+@@ -1,7 +1,10 @@
  package net.minecraft.entity;
  
 +import cpw.mods.fml.common.FMLLog;
  import cpw.mods.fml.relauncher.Side;
  import cpw.mods.fml.relauncher.SideOnly;
-+
 +import java.util.ArrayList;
 +import java.util.HashMap;
  import java.util.List;
  import java.util.Random;
  import java.util.UUID;
-+
- import net.minecraft.block.Block;
- import net.minecraft.block.BlockFluid;
- import net.minecraft.block.StepSound;
-@@ -13,8 +18,13 @@
+@@ -13,9 +16,14 @@
  import net.minecraft.crash.CrashReportCategory;
  import net.minecraft.enchantment.EnchantmentProtection;
  import net.minecraft.entity.effect.EntityLightningBolt;
@@ -26,13 +21,14 @@
 +import net.minecraft.entity.item.EntityMinecart;
 +import net.minecraft.entity.item.EntityPainting;
  import net.minecraft.entity.player.EntityPlayer;
-+import net.minecraft.item.Item;
+ import net.minecraft.init.Blocks;
++import net.minecraft.init.Items;
+ import net.minecraft.item.Item;
  import net.minecraft.item.ItemStack;
  import net.minecraft.nbt.NBTTagCompound;
- import net.minecraft.nbt.NBTTagDouble;
-@@ -26,12 +36,18 @@
- import net.minecraft.util.DamageSource;
+@@ -30,12 +38,17 @@
  import net.minecraft.util.Direction;
+ import net.minecraft.util.IChatComponent;
  import net.minecraft.util.MathHelper;
 +import net.minecraft.util.MovingObjectPosition;
  import net.minecraft.util.ReportedException;
@@ -44,29 +40,29 @@
 +import net.minecraftforge.common.IExtendedEntityProperties;
 +import net.minecraftforge.common.MinecraftForge;
 +import net.minecraftforge.event.entity.EntityEvent;
-+import net.minecraftforge.fluids.Fluid;
 +import net.minecraftforge.fluids.IFluidBlock;
  
  public abstract class Entity
  {
-@@ -218,6 +234,13 @@
-     private boolean invulnerable;
-     private UUID entityUniqueID;
-     public EnumEntitySize myEntitySize;
+@@ -116,7 +129,14 @@
+     protected UUID field_96093_i;
+     public Entity.EnumEntitySize field_70168_am;
+     private static final String __OBFID = "CL_00001533";
 +    /** Forge: Used to store custom data for each entity. */
 +    private NBTTagCompound customEntityData;
 +    public boolean captureDrops = false;
 +    public ArrayList<EntityItem> capturedDrops = new ArrayList<EntityItem>();
 +    private UUID persistentID;
-+
-+    private HashMap<String, IExtendedEntityProperties> extendedProperties;
  
-     public Entity(World par1World)
++    protected HashMap<String, IExtendedEntityProperties> extendedProperties;
++
+     public int func_145782_y()
      {
-@@ -245,6 +268,15 @@
-         this.dataWatcher.addObject(0, Byte.valueOf((byte)0));
-         this.dataWatcher.addObject(1, Short.valueOf((short)300));
-         this.entityInit();
+         return this.field_145783_c;
+@@ -153,6 +173,15 @@
+         this.field_70180_af.func_75682_a(0, Byte.valueOf((byte)0));
+         this.field_70180_af.func_75682_a(1, Short.valueOf((short)300));
+         this.func_70088_a();
 +
 +        extendedProperties = new HashMap<String, IExtendedEntityProperties>();
 +
@@ -74,24 +70,24 @@
 +
 +        for (IExtendedEntityProperties props : this.extendedProperties.values())
 +        {
-+            props.init(this, par1World);
++            props.init(this, p_i1582_1_);
 +        }
      }
  
-     protected abstract void entityInit();
-@@ -1164,11 +1196,20 @@
-         int k = MathHelper.floor_double(this.posZ);
-         int l = this.worldObj.getBlockId(i, j, k);
+     protected abstract void func_70088_a();
+@@ -991,9 +1020,22 @@
  
--        if (l != 0 && Block.blocksList[l].blockMaterial == par1Material)
--        {
--            float f = BlockFluid.getFluidHeightPercent(this.worldObj.getBlockMetadata(i, j, k)) - 0.11111111F;
+         if (block.func_149688_o() == p_70055_1_)
+         {
+-            float f = BlockLiquid.func_149801_b(this.field_70170_p.func_72805_g(i, j, k)) - 0.11111111F;
 -            float f1 = (float)(j + 1) - f;
 -            return d0 < (double)f1;
-+        Block block = Block.blocksList[l];
-+        if (block != null && block.blockMaterial == par1Material)
-+        {
-+            double filled = block.getFilledPercentage(worldObj, i, j, k);
++            double filled = 1.0f; //If it's not a liquid assume it's a solid block
++            if (block instanceof IFluidBlock)
++            {
++                filled = ((IFluidBlock)block).getFilledPercentage(field_70170_p, i, j, k);
++            }
++
 +            if (filled < 0)
 +            {
 +                filled *= -1;
@@ -105,94 +101,104 @@
          }
          else
          {
-@@ -1529,6 +1570,21 @@
-             par1NBTTagCompound.setInteger("PortalCooldown", this.timeUntilPortal);
-             par1NBTTagCompound.setLong("UUIDMost", this.entityUniqueID.getMostSignificantBits());
-             par1NBTTagCompound.setLong("UUIDLeast", this.entityUniqueID.getLeastSignificantBits());
+@@ -1278,8 +1320,27 @@
+             p_70109_1_.func_74768_a("PortalCooldown", this.field_71088_bW);
+             p_70109_1_.func_74772_a("UUIDMost", this.func_110124_au().getMostSignificantBits());
+             p_70109_1_.func_74772_a("UUIDLeast", this.func_110124_au().getLeastSignificantBits());
+-            this.func_70014_b(p_70109_1_);
 +            if (customEntityData != null)
 +            {
-+                par1NBTTagCompound.setCompoundTag("ForgeData", customEntityData);
++                p_70109_1_.func_74782_a("ForgeData", customEntityData);
 +            }
-+
-+            for (String identifier : this.extendedProperties.keySet()){
-+                try{
+ 
++           for (String identifier : this.extendedProperties.keySet())
++           {
++                try
++                {
 +                    IExtendedEntityProperties props = this.extendedProperties.get(identifier);
-+                    props.saveNBTData(par1NBTTagCompound);
-+                }catch (Throwable t){
++                    props.saveNBTData(p_70109_1_);
++                }
++                catch (Throwable t)
++                {
 +                    FMLLog.severe("Failed to save extended properties for %s.  This is a mod issue.", identifier);
 +                    t.printStackTrace();
 +                }
 +            }
 +
-             this.writeEntityToNBT(par1NBTTagCompound);
++           this.func_70014_b(p_70109_1_);
++
+             if (this.field_70154_o != null)
+             {
+                 NBTTagCompound nbttagcompound1 = new NBTTagCompound();
+@@ -1345,6 +1406,30 @@
  
-             if (this.ridingEntity != null)
-@@ -1599,6 +1655,26 @@
- 
-             this.setPosition(this.posX, this.posY, this.posZ);
-             this.setRotation(this.rotationYaw, this.rotationPitch);
-+            if (par1NBTTagCompound.hasKey("ForgeData"))
+             this.func_70107_b(this.field_70165_t, this.field_70163_u, this.field_70161_v);
+             this.func_70101_b(this.field_70177_z, this.field_70125_A);
++            if (p_70020_1_.func_74764_b("ForgeData"))
 +            {
-+                customEntityData = par1NBTTagCompound.getCompoundTag("ForgeData");
++                customEntityData = p_70020_1_.func_74775_l("ForgeData");
 +            }
 +
-+            for (String identifier : this.extendedProperties.keySet()){
-+                try{
++            for (String identifier : this.extendedProperties.keySet())
++            {
++                try
++                {
 +                    IExtendedEntityProperties props = this.extendedProperties.get(identifier);
-+                    props.loadNBTData(par1NBTTagCompound);
-+                }catch (Throwable t){
++                    props.loadNBTData(p_70020_1_);
++                }
++                catch (Throwable t)
++                {
 +                    FMLLog.severe("Failed to load extended properties for %s.  This is a mod issue.", identifier);
 +                    t.printStackTrace();
 +                }
 +            }
 +
 +            //Rawr, legacy code, Vanilla added a UUID, keep this so older maps will convert properly
-+            if (par1NBTTagCompound.hasKey("PersistentIDMSB") && par1NBTTagCompound.hasKey("PersistentIDLSB"))
++            if (p_70020_1_.func_74764_b("PersistentIDMSB") && p_70020_1_.func_74764_b("PersistentIDLSB"))
 +            {
-+                this.entityUniqueID = new UUID(par1NBTTagCompound.getLong("PersistentIDMSB"), par1NBTTagCompound.getLong("PersistentIDLSB"));
++                this.field_96093_i = new UUID(p_70020_1_.func_74763_f("PersistentIDMSB"), p_70020_1_.func_74763_f("PersistentIDLSB"));
 +            }
-             this.readEntityFromNBT(par1NBTTagCompound);
+             this.func_70037_a(p_70020_1_);
  
-             if (this.shouldSetPosAfterLoading())
-@@ -1711,7 +1787,14 @@
+             if (this.func_142008_O())
+@@ -1423,7 +1508,14 @@
          {
-             EntityItem entityitem = new EntityItem(this.worldObj, this.posX, this.posY + (double)par2, this.posZ, par1ItemStack);
-             entityitem.delayBeforeCanPickup = 10;
--            this.worldObj.spawnEntityInWorld(entityitem);
+             EntityItem entityitem = new EntityItem(this.field_70170_p, this.field_70165_t, this.field_70163_u + (double)p_70099_2_, this.field_70161_v, p_70099_1_);
+             entityitem.field_145804_b = 10;
+-            this.field_70170_p.func_72838_d(entityitem);
 +            if (captureDrops)
 +            {
 +                capturedDrops.add(entityitem);
 +            }
 +            else
 +            {
-+                this.worldObj.spawnEntityInWorld(entityitem);
++                this.field_70170_p.func_72838_d(entityitem);
 +            }
              return entityitem;
          }
-     }
-@@ -2010,7 +2093,7 @@
-      */
-     public boolean isRiding()
+         else
+@@ -1687,7 +1779,7 @@
+ 
+     public boolean func_70115_ae()
      {
--        return this.ridingEntity != null;
-+        return this.ridingEntity != null && ridingEntity.shouldRiderSit();
+-        return this.field_70154_o != null;
++        return this.field_70154_o != null && field_70154_o.shouldRiderSit();
      }
  
-     /**
-@@ -2385,7 +2468,7 @@
-      */
-     public float getBlockExplosionResistance(Explosion par1Explosion, World par2World, int par3, int par4, int par5, Block par6Block)
+     public boolean func_70093_af()
+@@ -1988,7 +2080,7 @@
+ 
+     public float func_145772_a(Explosion p_145772_1_, World p_145772_2_, int p_145772_3_, int p_145772_4_, int p_145772_5_, Block p_145772_6_)
      {
--        return par6Block.getExplosionResistance(this);
-+        return par6Block.getExplosionResistance(this, par2World, par3, par4, par5, posX, posY + (double)getEyeHeight(), posZ);
+-        return p_145772_6_.func_149638_a(this);
++        return p_145772_6_.getExplosionResistance(this, p_145772_2_, p_145772_3_, p_145772_4_, p_145772_5_, field_70165_t, field_70163_u + func_70047_e(), field_70161_v);
      }
  
-     public boolean shouldExplodeBlock(Explosion par1Explosion, World par2World, int par3, int par4, int par5, int par6, float par7)
-@@ -2451,4 +2534,170 @@
-     {
-         return this.getEntityName();
-     }
-+
+     public boolean func_145774_a(Explosion p_145774_1_, World p_145774_2_, int p_145774_3_, int p_145774_4_, int p_145774_5_, Block p_145774_6_, float p_145774_7_)
+@@ -2058,6 +2150,174 @@
+ 
+     public void func_145781_i(int p_145781_1_) {}
+ 
 +    /* ================================== Forge Start =====================================*/
 +    /**
 +     * Returns a NBTTagCompound that can be used to store custom data for this entity.
@@ -227,7 +233,23 @@
 +    {
 +        if (this instanceof EntityPainting)
 +        {
-+            return new ItemStack(Item.painting);
++            return new ItemStack(Items.field_151159_an);
++        }
++        else if (this instanceof EntityLeashKnot)
++        {
++            return new ItemStack(Items.field_151058_ca);
++        }
++        else if (this instanceof EntityItemFrame)
++        {
++            ItemStack held = ((EntityItemFrame)this).func_82335_i();
++            if (held == null)
++            {
++                return new ItemStack(Items.field_151160_bD);
++            }
++            else
++            {
++                return held.func_77946_l();
++            }
 +        }
 +        else if (this instanceof EntityMinecart)
 +        {
@@ -235,30 +257,14 @@
 +        }
 +        else if (this instanceof EntityBoat)
 +        {
-+            return new ItemStack(Item.boat);
-+        }
-+        else if (this instanceof EntityItemFrame)
-+        {
-+            ItemStack held = ((EntityItemFrame)this).getDisplayedItem();
-+            if (held == null)
-+            {
-+                return new ItemStack(Item.itemFrame);
-+            }
-+            else
-+            {
-+                return held.copy();
-+            }
-+        }
-+        else if (this instanceof EntityLeashKnot)
-+        {
-+            return new ItemStack(Item.leash);
++            return new ItemStack(Items.field_151124_az);
 +        }
 +        else
 +        {
-+            int id = EntityList.getEntityID(this);
-+            if (id > 0 && EntityList.entityEggs.containsKey(id))
++            int id = EntityList.func_75619_a(this);
++            if (id > 0 && EntityList.field_75627_a.containsKey(id))
 +            {
-+                return new ItemStack(Item.monsterPlacer, 1, id);
++                return new ItemStack(Items.field_151063_bx, 1, id);
 +            }
 +        }
 +        return null;
@@ -266,7 +272,7 @@
 +
 +    public UUID getPersistentID()
 +    {
-+        return entityUniqueID;
++        return field_96093_i;
 +    }
 +
 +    /**
@@ -274,7 +280,7 @@
 +     */
 +    public final void resetEntityId()
 +    {
-+        this.entityId = nextEntityID++;
++        this.field_145783_c = field_70152_a++;
 +    }
 +
 +    public boolean shouldRenderInPass(int pass)
@@ -290,7 +296,7 @@
 +     */
 +    public boolean isCreatureType(EnumCreatureType type, boolean forSpawnCount)
 +    {
-+        return type.getCreatureClass().isAssignableFrom(this.getClass());
++        return type.func_75598_a().isAssignableFrom(this.getClass());
 +    }
 +
 +    /**
@@ -355,7 +361,12 @@
 +     * @param rider The entity that is riding
 +     * @return if the entity should be dismounted when under water
 +     */
-+    public boolean shouldDismountInWater(Entity rider){
++    public boolean shouldDismountInWater(Entity rider)
++    {
 +        return this instanceof EntityLivingBase;
 +    }
- }
++    /* ================================== Forge End =====================================*/
++
+     public static enum EnumEntitySize
+     {
+         SIZE_1,

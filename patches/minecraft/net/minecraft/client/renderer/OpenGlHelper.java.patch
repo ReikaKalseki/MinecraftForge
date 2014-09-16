@@ -1,25 +1,26 @@
---- ../src_base/minecraft/net/minecraft/client/renderer/OpenGlHelper.java
-+++ ../src_work/minecraft/net/minecraft/client/renderer/OpenGlHelper.java
-@@ -25,6 +25,10 @@
-      * True if the renderer supports multitextures and the OpenGL version != 1.3
-      */
-     private static boolean useMultitextureARB;
-+
+--- ../src-base/minecraft/net/minecraft/client/renderer/OpenGlHelper.java
++++ ../src-work/minecraft/net/minecraft/client/renderer/OpenGlHelper.java
+@@ -54,6 +54,10 @@
+     private static String field_153196_B = "";
+     private static final String __OBFID = "CL_00001179";
+ 
 +    /* Stores the last values sent into setLightmapTextureCoords */
 +    public static float lastBrightnessX = 0.0f;
 +    public static float lastBrightnessY = 0.0f;
- 
-     /**
-      * Initializes the texture constants to be used when rendering lightmap values
-@@ -88,5 +92,11 @@
++
+     public static void func_77474_a()
+     {
+         ContextCapabilities contextcapabilities = GLContext.getCapabilities();
+@@ -688,6 +692,12 @@
          {
-             GL13.glMultiTexCoord2f(par0, par1, par2);
+             GL13.glMultiTexCoord2f(p_77475_0_, p_77475_1_, p_77475_2_);
          }
 +
-+        if (par0 == lightmapTexUnit)
++        if (p_77475_0_ == field_77476_b)
 +        {
-+            lastBrightnessX = par1;
-+            lastBrightnessY = par2;
++            lastBrightnessX = p_77475_1_;
++            lastBrightnessY = p_77475_2_;
 +        }
      }
- }
+ 
+     public static void func_148821_a(int p_148821_0_, int p_148821_1_, int p_148821_2_, int p_148821_3_)

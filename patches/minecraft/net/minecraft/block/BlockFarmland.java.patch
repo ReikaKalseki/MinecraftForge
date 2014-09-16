@@ -1,22 +1,20 @@
---- ../src_base/minecraft/net/minecraft/block/BlockFarmland.java
-+++ ../src_work/minecraft/net/minecraft/block/BlockFarmland.java
-@@ -10,6 +10,9 @@
+--- ../src-base/minecraft/net/minecraft/block/BlockFarmland.java
++++ ../src-work/minecraft/net/minecraft/block/BlockFarmland.java
+@@ -12,6 +12,8 @@
  import net.minecraft.util.AxisAlignedBB;
- import net.minecraft.util.Icon;
+ import net.minecraft.util.IIcon;
  import net.minecraft.world.World;
-+
-+import net.minecraftforge.common.ForgeDirection;
 +import net.minecraftforge.common.IPlantable;
++import net.minecraftforge.common.util.ForgeDirection;
  
  public class BlockFarmland extends Block
  {
-@@ -115,7 +118,8 @@
+@@ -94,7 +96,7 @@
              {
-                 int j1 = par1World.getBlockId(l, par3 + 1, i1);
+                 Block block = p_149822_1_.func_147439_a(l, p_149822_3_ + 1, i1);
  
--                if (j1 == Block.crops.blockID || j1 == Block.melonStem.blockID || j1 == Block.pumpkinStem.blockID || j1 == Block.potato.blockID || j1 == Block.carrot.blockID)
-+                Block plant = blocksList[j1];
-+                if (plant instanceof IPlantable && canSustainPlant(par1World, par2, par3, par4, ForgeDirection.UP, (IPlantable)plant))
+-                if (block == Blocks.field_150464_aj || block == Blocks.field_150394_bc || block == Blocks.field_150393_bb || block == Blocks.field_150469_bN || block == Blocks.field_150459_bM)
++                if (block instanceof IPlantable && canSustainPlant(p_149822_1_, p_149822_2_, p_149822_3_, p_149822_4_, ForgeDirection.UP, (IPlantable)block))
                  {
                      return true;
                  }

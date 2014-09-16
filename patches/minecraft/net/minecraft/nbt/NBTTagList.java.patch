@@ -1,5 +1,5 @@
---- ../src_base/minecraft/net/minecraft/nbt/NBTTagList.java
-+++ ../src_work/minecraft/net/minecraft/nbt/NBTTagList.java
+--- ../src-base/minecraft/net/minecraft/nbt/NBTTagList.java
++++ ../src-work/minecraft/net/minecraft/nbt/NBTTagList.java
 @@ -1,7 +1,5 @@
  package net.minecraft.nbt;
  
@@ -8,12 +8,19 @@
  import java.io.DataInput;
  import java.io.DataOutput;
  import java.io.IOException;
-@@ -99,8 +97,6 @@
-         this.tagList.add(par1NBTBase);
+@@ -91,7 +89,6 @@
+         this.field_74747_a.add(p_74742_1_);
      }
  
 -    @SideOnly(Side.CLIENT)
--
-     /**
-      * Removes a tag at the given index.
-      */
+     public void func_150304_a(int p_150304_1_, NBTBase p_150304_2_)
+     {
+         if (p_150304_1_ >= 0 && p_150304_1_ < this.field_74747_a.size())
+@@ -114,7 +111,6 @@
+         }
+     }
+ 
+-    @SideOnly(Side.CLIENT)
+     public NBTBase func_74744_a(int p_74744_1_)
+     {
+         return (NBTBase)this.field_74747_a.remove(p_74744_1_);

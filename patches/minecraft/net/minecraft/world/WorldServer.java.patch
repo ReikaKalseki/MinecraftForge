@@ -1,14 +1,14 @@
---- ../src_base/minecraft/net/minecraft/world/WorldServer.java
-+++ ../src_work/minecraft/net/minecraft/world/WorldServer.java
-@@ -2,6 +2,7 @@
- 
+--- ../src-base/minecraft/net/minecraft/world/WorldServer.java
++++ ../src-work/minecraft/net/minecraft/world/WorldServer.java
+@@ -3,6 +3,7 @@
+ import com.google.common.collect.Lists;
  import cpw.mods.fml.relauncher.Side;
  import cpw.mods.fml.relauncher.SideOnly;
 +import java.io.File;
  import java.util.ArrayList;
  import java.util.HashSet;
  import java.util.Iterator;
-@@ -47,11 +48,18 @@
+@@ -50,11 +51,19 @@
  import net.minecraft.world.biome.WorldChunkManager;
  import net.minecraft.world.chunk.Chunk;
  import net.minecraft.world.chunk.IChunkProvider;
@@ -19,135 +19,109 @@
  import net.minecraft.world.gen.feature.WorldGeneratorBonusChest;
  import net.minecraft.world.storage.ISaveHandler;
 +import net.minecraftforge.common.ChestGenHooks;
-+import static net.minecraftforge.common.ChestGenHooks.*;
++import static net.minecraftforge.common.ChestGenHooks.BONUS_CHEST;
 +import net.minecraftforge.common.DimensionManager;
 +import net.minecraftforge.common.MinecraftForge;
 +import net.minecraftforge.event.ForgeEventFactory;
 +import net.minecraftforge.event.world.WorldEvent;
++
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
  
- public class WorldServer extends World
- {
-@@ -93,6 +101,10 @@
-     /** An IntHashMap of entity IDs (integers) to their Entity objects. */
-     private IntHashMap entityIdMap;
+@@ -79,6 +88,10 @@
+     private IntHashMap field_73066_T;
+     private static final String __OBFID = "CL_00001437";
  
 +    /** Stores the recently processed (lighting) chunks */
 +    protected Set<ChunkCoordIntPair> doneChunks = new HashSet<ChunkCoordIntPair>();
 +    public List<Teleporter> customTeleporters = new ArrayList<Teleporter>();
 +
-     public WorldServer(MinecraftServer par1MinecraftServer, ISaveHandler par2ISaveHandler, String par3Str, int par4, WorldSettings par5WorldSettings, Profiler par6Profiler, ILogAgent par7ILogAgent)
+     public WorldServer(MinecraftServer p_i45284_1_, ISaveHandler p_i45284_2_, String p_i45284_3_, int p_i45284_4_, WorldSettings p_i45284_5_, Profiler p_i45284_6_)
      {
-         super(par2ISaveHandler, par3Str, par5WorldSettings, WorldProvider.getProviderForDimension(par4), par6Profiler, par7ILogAgent);
-@@ -125,8 +137,12 @@
-             this.mapStorage.setData("scoreboard", scoreboardsavedata);
+         super(p_i45284_2_, p_i45284_3_, p_i45284_5_, WorldProvider.func_76570_a(p_i45284_4_), p_i45284_6_);
+@@ -111,8 +124,12 @@
+             this.field_72988_C.func_75745_a("scoreboard", scoreboardsavedata);
          }
  
--        scoreboardsavedata.func_96499_a(this.worldScoreboard);
+-        scoreboardsavedata.func_96499_a(this.field_96442_D);
 +        if (!(this instanceof WorldServerMulti)) //Forge: We fix the global mapStorage, which causes us to share scoreboards early. So don't associate the save data with the temporary scoreboard
 +        {
-+            scoreboardsavedata.func_96499_a(this.worldScoreboard);
++            scoreboardsavedata.func_96499_a(this.field_96442_D);
 +        }
-         ((ServerScoreboard)this.worldScoreboard).func_96547_a(scoreboardsavedata);
-+        DimensionManager.setWorld(par4, this);
+         ((ServerScoreboard)this.field_96442_D).func_96547_a(scoreboardsavedata);
++        DimensionManager.setWorld(p_i45284_4_, this);
      }
  
-     /**
-@@ -188,6 +204,10 @@
-         this.villageSiegeObj.tick();
-         this.theProfiler.endStartSection("portalForcer");
-         this.worldTeleporter.removeStalePortalLocations(this.getTotalWorldTime());
+     public void func_72835_b()
+@@ -171,6 +188,10 @@
+         this.field_72983_E.func_75528_a();
+         this.field_72984_F.func_76318_c("portalForcer");
+         this.field_85177_Q.func_85189_a(this.func_82737_E());
 +        for (Teleporter tele : customTeleporters)
 +        {
-+            tele.removeStalePortalLocations(getTotalWorldTime());
++            tele.func_85189_a(func_82737_E());
 +        }
-         this.theProfiler.endSection();
-         this.sendAndApplyBlockEvents();
+         this.field_72984_F.func_76319_b();
+         this.func_147488_Z();
      }
-@@ -198,6 +218,7 @@
-     public SpawnListEntry spawnRandomCreature(EnumCreatureType par1EnumCreatureType, int par2, int par3, int par4)
+@@ -178,6 +199,7 @@
+     public BiomeGenBase.SpawnListEntry func_73057_a(EnumCreatureType p_73057_1_, int p_73057_2_, int p_73057_3_, int p_73057_4_)
      {
-         List list = this.getChunkProvider().getPossibleCreatures(par1EnumCreatureType, par2, par3, par4);
-+        list = ForgeEventFactory.getPotentialSpawns(this, par1EnumCreatureType, par2, par3, par4, list);
-         return list != null && !list.isEmpty() ? (SpawnListEntry)WeightedRandom.getRandomItem(this.rand, list) : null;
+         List list = this.func_72863_F().func_73155_a(p_73057_1_, p_73057_2_, p_73057_3_, p_73057_4_);
++        list = ForgeEventFactory.getPotentialSpawns(this, p_73057_1_, p_73057_2_, p_73057_3_, p_73057_4_, list);
+         return list != null && !list.isEmpty() ? (BiomeGenBase.SpawnListEntry)WeightedRandom.func_76271_a(this.field_73012_v, list) : null;
      }
  
-@@ -241,10 +262,7 @@
+@@ -218,10 +240,7 @@
  
-     private void resetRainAndThunder()
+     private void func_73051_P()
      {
--        this.worldInfo.setRainTime(0);
--        this.worldInfo.setRaining(false);
--        this.worldInfo.setThunderTime(0);
--        this.worldInfo.setThundering(false);
-+        provider.resetRainAndThunder();
+-        this.field_72986_A.func_76080_g(0);
+-        this.field_72986_A.func_76084_b(false);
+-        this.field_72986_A.func_76090_f(0);
+-        this.field_72986_A.func_76069_a(false);
++        field_73011_w.resetRainAndThunder();
      }
  
-     public boolean areAllPlayersAsleep()
-@@ -315,6 +333,14 @@
-         int i = 0;
-         int j = 0;
-         Iterator iterator = this.activeChunkSet.iterator();
-+
-+        doneChunks.retainAll(activeChunkSet);
-+        if (doneChunks.size() == activeChunkSet.size())
-+        {
-+            doneChunks.clear();
-+        }
-+
-+        final long startTime = System.nanoTime();
- 
-         while (iterator.hasNext())
-         {
-@@ -325,14 +351,18 @@
-             Chunk chunk = this.getChunkFromChunkCoords(chunkcoordintpair.chunkXPos, chunkcoordintpair.chunkZPos);
-             this.moodSoundAndLightCheck(k, l, chunk);
-             this.theProfiler.endStartSection("tickChunk");
--            chunk.updateSkylight();
-+            //Limits and evenly distributes the lighting update time
-+            if (System.nanoTime() - startTime <= 4000000 && doneChunks.add(chunkcoordintpair))
-+            {
-+                chunk.updateSkylight();
-+            }
-             this.theProfiler.endStartSection("thunder");
-             int i1;
-             int j1;
+     public boolean func_73056_e()
+@@ -301,7 +320,7 @@
              int k1;
              int l1;
  
--            if (this.rand.nextInt(100000) == 0 && this.isRaining() && this.isThundering())
-+            if (provider.canDoLightning(chunk) && this.rand.nextInt(100000) == 0 && this.isRaining() && this.isThundering())
+-            if (this.field_73012_v.nextInt(100000) == 0 && this.func_72896_J() && this.func_72911_I())
++            if (field_73011_w.canDoLightning(chunk) && this.field_73012_v.nextInt(100000) == 0 && this.func_72896_J() && this.func_72911_I())
              {
-                 this.updateLCG = this.updateLCG * 3 + 1013904223;
-                 i1 = this.updateLCG >> 2;
-@@ -349,7 +379,7 @@
-             this.theProfiler.endStartSection("iceandsnow");
-             int i2;
+                 this.field_73005_l = this.field_73005_l * 3 + 1013904223;
+                 i1 = this.field_73005_l >> 2;
+@@ -317,7 +336,7 @@
  
--            if (this.rand.nextInt(16) == 0)
-+            if (provider.canDoRainSnowIce(chunk) && this.rand.nextInt(16) == 0)
+             this.field_72984_F.func_76318_c("iceandsnow");
+ 
+-            if (this.field_73012_v.nextInt(16) == 0)
++            if (field_73011_w.canDoRainSnowIce(chunk) && this.field_73012_v.nextInt(16) == 0)
              {
-                 this.updateLCG = this.updateLCG * 3 + 1013904223;
-                 i1 = this.updateLCG >> 2;
-@@ -437,6 +467,9 @@
-     public void scheduleBlockUpdateWithPriority(int par1, int par2, int par3, int par4, int par5, int par6)
+                 this.field_73005_l = this.field_73005_l * 3 + 1013904223;
+                 i1 = this.field_73005_l >> 2;
+@@ -393,6 +412,9 @@
+     public void func_147454_a(int p_147454_1_, int p_147454_2_, int p_147454_3_, Block p_147454_4_, int p_147454_5_, int p_147454_6_)
      {
-         NextTickListEntry nextticklistentry = new NextTickListEntry(par1, par2, par3, par4);
+         NextTickListEntry nextticklistentry = new NextTickListEntry(p_147454_1_, p_147454_2_, p_147454_3_, p_147454_4_);
 +        //Keeping here as a note for future when it may be restored.
 +        //boolean isForced = getPersistentChunks().containsKey(new ChunkCoordIntPair(nextticklistentry.xCoord >> 4, nextticklistentry.zCoord >> 4));
 +        //byte b0 = isForced ? 0 : 8;
          byte b0 = 0;
  
-         if (this.scheduledUpdatesAreImmediate && par4 > 0)
-@@ -502,7 +535,7 @@
-      */
-     public void updateEntities()
+         if (this.field_72999_e && p_147454_4_.func_149688_o() != Material.field_151579_a)
+@@ -452,7 +474,7 @@
+ 
+     public void func_72939_s()
      {
--        if (this.playerEntities.isEmpty())
-+        if (this.playerEntities.isEmpty() && getPersistentChunks().isEmpty())
+-        if (this.field_73010_i.isEmpty())
++        if (this.field_73010_i.isEmpty() && getPersistentChunks().isEmpty())
          {
-             if (this.updateEntityTick++ >= 1200)
+             if (this.field_80004_Q++ >= 1200)
              {
-@@ -568,6 +601,9 @@
+@@ -512,6 +534,9 @@
              {
                  nextticklistentry = (NextTickListEntry)iterator.next();
                  iterator.remove();
@@ -156,90 +130,89 @@
 +                //byte b0 = isForced ? 0 : 8;
                  byte b0 = 0;
  
-                 if (this.checkChunksExist(nextticklistentry.xCoord - b0, nextticklistentry.yCoord - b0, nextticklistentry.zCoord - b0, nextticklistentry.xCoord + b0, nextticklistentry.yCoord + b0, nextticklistentry.zCoord + b0))
-@@ -700,16 +736,28 @@
+                 if (this.func_72904_c(nextticklistentry.field_77183_a - b0, nextticklistentry.field_77181_b - b0, nextticklistentry.field_77182_c - b0, nextticklistentry.field_77183_a + b0, nextticklistentry.field_77181_b + b0, nextticklistentry.field_77182_c + b0))
+@@ -634,13 +659,26 @@
      {
          ArrayList arraylist = new ArrayList();
  
--        for (int k1 = 0; k1 < this.loadedTileEntityList.size(); ++k1)
--        {
--            TileEntity tileentity = (TileEntity)this.loadedTileEntityList.get(k1);
+-        for (int k1 = 0; k1 < this.field_147482_g.size(); ++k1)
++        for(int x = (p_147486_1_ >> 4); x <= (p_147486_4_ >> 4); x++)
+         {
+-            TileEntity tileentity = (TileEntity)this.field_147482_g.get(k1);
 -
--            if (tileentity.xCoord >= par1 && tileentity.yCoord >= par2 && tileentity.zCoord >= par3 && tileentity.xCoord < par4 && tileentity.yCoord < par5 && tileentity.zCoord < par6)
--            {
+-            if (tileentity.field_145851_c >= p_147486_1_ && tileentity.field_145848_d >= p_147486_2_ && tileentity.field_145849_e >= p_147486_3_ && tileentity.field_145851_c < p_147486_4_ && tileentity.field_145848_d < p_147486_5_ && tileentity.field_145849_e < p_147486_6_)
++            for(int z = (p_147486_3_ >> 4); z <= (p_147486_6_ >> 4); z++)
+             {
 -                arraylist.add(tileentity);
--            }
--        }
--
-+        for(int x = (par1 >> 4); x <= (par4 >> 4); x++)
-+        {
-+            for(int z = (par3 >> 4); z <= (par6 >> 4); z++)
-+            {
-+                Chunk chunk = getChunkFromChunkCoords(x, z);
++                Chunk chunk = func_72964_e(x, z);
 +                if (chunk != null)
 +                {
-+                    for(Object obj : chunk.chunkTileEntityMap.values())
++                    for(Object obj : chunk.field_150816_i.values())
 +                    {
 +                        TileEntity entity = (TileEntity)obj;
-+                        if (!entity.isInvalid())
++                        if (!entity.func_145837_r())
 +                        {
-+                            if (entity.xCoord >= par1 && entity.yCoord >= par2 && entity.zCoord >= par3 &&
-+                                entity.xCoord <= par4 && entity.yCoord <= par5 && entity.zCoord <= par6)
++                            if (entity.field_145851_c >= p_147486_1_ && entity.field_145848_d >= p_147486_2_ && entity.field_145849_e >= p_147486_3_ &&
++                                entity.field_145851_c <= p_147486_4_ && entity.field_145848_d <= p_147486_5_ && entity.field_145849_e <= p_147486_6_)
 +                            {
 +                                arraylist.add(entity);
 +                            }
 +                        }
 +                    }
 +                }
-+            }
-+        }
-         return arraylist;
+             }
+         }
+ 
+@@ -649,9 +687,14 @@
+ 
+     public boolean func_72962_a(EntityPlayer p_72962_1_, int p_72962_2_, int p_72962_3_, int p_72962_4_)
+     {
+-        return !this.field_73061_a.func_96290_a(this, p_72962_2_, p_72962_3_, p_72962_4_, p_72962_1_);
++        return super.func_72962_a(p_72962_1_, p_72962_2_, p_72962_3_, p_72962_4_);
      }
  
-@@ -717,6 +765,11 @@
-      * Called when checking if a certain block can be mined or not. The 'spawn safe zone' check is located here.
-      */
-     public boolean canMineBlock(EntityPlayer par1EntityPlayer, int par2, int par3, int par4)
++    public boolean canMineBlockBody(EntityPlayer par1EntityPlayer, int par2, int par3, int par4)
 +    {
-+        return super.canMineBlock(par1EntityPlayer, par2, par3, par4);
++        return !this.field_73061_a.func_96290_a(this, par2, par3, par4, par1EntityPlayer);
 +    }
 +
-+    public boolean canMineBlockBody(EntityPlayer par1EntityPlayer, int par2, int par3, int par4)
+     protected void func_72963_a(WorldSettings p_72963_1_)
      {
-         return !this.mcServer.isBlockProtected(this, par2, par3, par4, par1EntityPlayer);
-     }
-@@ -801,7 +854,7 @@
-      */
-     protected void createBonusChest()
+         if (this.field_73066_T == null)
+@@ -726,7 +769,7 @@
+ 
+     protected void func_73047_i()
      {
--        WorldGeneratorBonusChest worldgeneratorbonuschest = new WorldGeneratorBonusChest(bonusChestContent, 10);
-+        WorldGeneratorBonusChest worldgeneratorbonuschest = new WorldGeneratorBonusChest(ChestGenHooks.getItems(BONUS_CHEST, rand), ChestGenHooks.getCount(BONUS_CHEST, rand));
+-        WorldGeneratorBonusChest worldgeneratorbonuschest = new WorldGeneratorBonusChest(field_73069_S, 10);
++        WorldGeneratorBonusChest worldgeneratorbonuschest = new WorldGeneratorBonusChest(ChestGenHooks.getItems(BONUS_CHEST, field_73012_v), ChestGenHooks.getCount(BONUS_CHEST, field_73012_v));
  
          for (int i = 0; i < 10; ++i)
          {
-@@ -844,6 +897,7 @@
+@@ -763,6 +806,7 @@
              }
  
-             this.chunkProvider.saveChunks(par1, par2IProgressUpdate);
+             this.field_73020_y.func_73151_a(p_73044_1_, p_73044_2_);
 +            MinecraftForge.EVENT_BUS.post(new WorldEvent.Save(this));
+             ArrayList arraylist = Lists.newArrayList(this.field_73059_b.func_152380_a());
+             Iterator iterator = arraylist.iterator();
+ 
+@@ -791,6 +835,7 @@
+         this.func_72906_B();
+         this.field_73019_z.func_75755_a(this.field_72986_A, this.field_73061_a.func_71203_ab().func_72378_q());
+         this.field_72988_C.func_75744_a();
++        this.perWorldStorage.func_75744_a();
+     }
+ 
+     public void func_72923_a(Entity p_72923_1_)
+@@ -1002,6 +1047,11 @@
          }
      }
  
-@@ -866,6 +920,7 @@
-         this.checkSessionLock();
-         this.saveHandler.saveWorldInfoWithPlayer(this.worldInfo, this.mcServer.getConfigurationManager().getHostPlayerData());
-         this.mapStorage.saveAllData();
-+        this.perWorldStorage.saveAllData();
-     }
- 
-     protected void onEntityAdded(Entity par1Entity)
-@@ -1073,4 +1128,9 @@
-     {
-         return this.worldTeleporter;
-     }
-+
 +    public File getChunkSaveLocation()
 +    {
-+        return ((AnvilChunkLoader)theChunkProviderServer.currentChunkLoader).chunkSaveLocation;
++        return ((AnvilChunkLoader)field_73059_b.field_73247_e).field_75825_d;
 +    }
- }
++
+     static class ServerBlockEventList extends ArrayList
+         {
+             private static final String __OBFID = "CL_00001439";

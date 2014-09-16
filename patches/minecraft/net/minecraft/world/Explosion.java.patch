@@ -1,21 +1,21 @@
---- ../src_base/minecraft/net/minecraft/world/Explosion.java
-+++ ../src_work/minecraft/net/minecraft/world/Explosion.java
-@@ -92,7 +92,7 @@
-                             if (k1 > 0)
+--- ../src-base/minecraft/net/minecraft/world/Explosion.java
++++ ../src-work/minecraft/net/minecraft/world/Explosion.java
+@@ -86,7 +86,7 @@
+ 
+                             if (block.func_149688_o() != Material.field_151579_a)
                              {
-                                 Block block = Block.blocksList[k1];
--                                float f3 = this.exploder != null ? this.exploder.getBlockExplosionResistance(this, this.worldObj, l, i1, j1, block) : block.getExplosionResistance(this.exploder);
-+                                float f3 = this.exploder != null ? this.exploder.getBlockExplosionResistance(this, this.worldObj, l, i1, j1, block) : block.getExplosionResistance(this.exploder, worldObj, l, i1, j1, explosionX, explosionY, explosionZ);
+-                                float f3 = this.field_77283_e != null ? this.field_77283_e.func_145772_a(this, this.field_77287_j, j1, k1, l1, block) : block.func_149638_a(this.field_77283_e);
++                                float f3 = this.field_77283_e != null ? this.field_77283_e.func_145772_a(this, this.field_77287_j, j1, k1, l1, block) : block.getExplosionResistance(this.field_77283_e, field_77287_j, j1, k1, l1, field_77284_b, field_77285_c, field_77282_d);
                                  f1 -= (f3 + 0.3F) * f2;
                              }
  
-@@ -222,8 +222,7 @@
-                         block.dropBlockAsItemWithChance(this.worldObj, i, j, k, this.worldObj.getBlockMetadata(i, j, k), 1.0F / this.explosionSize, 0);
+@@ -211,8 +211,7 @@
+                         block.func_149690_a(this.field_77287_j, i, j, k, this.field_77287_j.func_72805_g(i, j, k), 1.0F / this.field_77280_f, 0);
                      }
  
--                    this.worldObj.setBlock(i, j, k, 0, 0, 3);
--                    block.onBlockDestroyedByExplosion(this.worldObj, i, j, k, this);
-+                    block.onBlockExploded(this.worldObj, i, j, k, this);
+-                    this.field_77287_j.func_147465_d(i, j, k, Blocks.field_150350_a, 0, 3);
+-                    block.func_149723_a(this.field_77287_j, i, j, k, this);
++                    block.onBlockExploded(this.field_77287_j, i, j, k, this);
                  }
              }
          }

@@ -1,5 +1,5 @@
---- ../src_base/minecraft/net/minecraft/client/model/ModelBox.java
-+++ ../src_work/minecraft/net/minecraft/client/model/ModelBox.java
+--- ../src-base/minecraft/net/minecraft/client/model/ModelBox.java
++++ ../src-work/minecraft/net/minecraft/client/model/ModelBox.java
 @@ -4,7 +4,6 @@
  import cpw.mods.fml.relauncher.SideOnly;
  import net.minecraft.client.renderer.Tessellator;
@@ -7,12 +7,12 @@
 -@SideOnly(Side.CLIENT)
  public class ModelBox
  {
-     /**
-@@ -96,6 +95,7 @@
-     /**
-      * Draw the six sided box defined by this ModelBox
-      */
+     private PositionTextureVertex[] field_78253_h;
+@@ -77,6 +76,7 @@
+         }
+     }
+ 
 +    @SideOnly(Side.CLIENT)
-     public void render(Tessellator par1Tessellator, float par2)
+     public void func_78245_a(Tessellator p_78245_1_, float p_78245_2_)
      {
-         for (int i = 0; i < this.quadList.length; ++i)
+         for (int i = 0; i < this.field_78254_i.length; ++i)

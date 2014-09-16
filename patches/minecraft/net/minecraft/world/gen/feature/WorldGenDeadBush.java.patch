@@ -1,22 +1,20 @@
---- ../src_base/minecraft/net/minecraft/world/gen/feature/WorldGenDeadBush.java
-+++ ../src_work/minecraft/net/minecraft/world/gen/feature/WorldGenDeadBush.java
-@@ -18,10 +18,16 @@
+--- ../src-base/minecraft/net/minecraft/world/gen/feature/WorldGenDeadBush.java
++++ ../src-work/minecraft/net/minecraft/world/gen/feature/WorldGenDeadBush.java
+@@ -19,10 +19,15 @@
      {
-         int l;
+         Block block;
  
--        for (boolean flag = false; ((l = par1World.getBlockId(par3, par4, par5)) == 0 || l == Block.leaves.blockID) && par4 > 0; --par4)
-+        Block block = null;
-+        do 
+-        while (((block = p_76484_1_.func_147439_a(p_76484_3_, p_76484_4_, p_76484_5_)).func_149688_o() == Material.field_151579_a || block.func_149688_o() == Material.field_151584_j) && p_76484_4_ > 0)
++        do
          {
--            ;
--        }
-+            block = Block.blocksList[par1World.getBlockId(par3,  par4, par5)];
-+            if (block != null && !block.isLeaves(par1World, par3, par4, par5))
++            block = p_76484_1_.func_147439_a(p_76484_3_, p_76484_4_, p_76484_5_);
++            if (!(block.isLeaves(p_76484_1_, p_76484_3_, p_76484_4_, p_76484_5_) || block.isAir(p_76484_1_, p_76484_3_, p_76484_4_, p_76484_5_)))
 +            {
 +                break;
 +            }
-+            par4--;
-+        } while (par4 > 0);
+             --p_76484_4_;
+-        }
++        } while (p_76484_4_ > 0);
  
-         for (int i1 = 0; i1 < 4; ++i1)
+         for (int l = 0; l < 4; ++l)
          {

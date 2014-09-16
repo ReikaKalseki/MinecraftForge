@@ -1,11 +1,11 @@
---- ../src_base/minecraft/net/minecraft/item/crafting/CraftingManager.java
-+++ ../src_work/minecraft/net/minecraft/item/crafting/CraftingManager.java
-@@ -283,7 +283,7 @@
+--- ../src-base/minecraft/net/minecraft/item/crafting/CraftingManager.java
++++ ../src-work/minecraft/net/minecraft/item/crafting/CraftingManager.java
+@@ -299,7 +299,7 @@
              }
          }
  
--        if (i == 2 && itemstack.itemID == itemstack1.itemID && itemstack.stackSize == 1 && itemstack1.stackSize == 1 && Item.itemsList[itemstack.itemID].isDamageable())
-+        if (i == 2 && itemstack.itemID == itemstack1.itemID && itemstack.stackSize == 1 && itemstack1.stackSize == 1 && Item.itemsList[itemstack.itemID].isRepairable())
+-        if (i == 2 && itemstack.func_77973_b() == itemstack1.func_77973_b() && itemstack.field_77994_a == 1 && itemstack1.field_77994_a == 1 && itemstack.func_77973_b().func_77645_m())
++        if (i == 2 && itemstack.func_77973_b() == itemstack1.func_77973_b() && itemstack.field_77994_a == 1 && itemstack1.field_77994_a == 1 && itemstack.func_77973_b().isRepairable())
          {
-             Item item = Item.itemsList[itemstack.itemID];
-             int k = item.getMaxDamage() - itemstack.getItemDamageForDisplay();
+             Item item = itemstack.func_77973_b();
+             int j1 = item.func_77612_l() - itemstack.func_77952_i();
